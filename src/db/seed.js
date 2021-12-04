@@ -29,6 +29,45 @@ db.query(departmentQuery, (err, result) => {
     return;
   }
 
-  console.log("Successfully entered DEPARTMENTS into department_db");
-  db.end();
+  console.log("Successfully entered DEPARTMENTS into department table.");
+  //   db.end();
+});
+
+// creating values for employee
+const employeeValues = employee
+  .map(
+    (employee) =>
+      `('${employee.first_name}', '${employee.last_name}', '${employee.role_id}', ${employee.manager_id})`
+  )
+  .join(",");
+
+// template string query for employee table
+const employeeQuery = `INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUE${employeeValues}`;
+
+db.query(employeeQuery, (err, result) => {
+  if (err) {
+    console.log(err);
+    return;
+  }
+
+  console.log("Successfully entered EMPLOYEES into employee table.");
+  //   db.end();
+});
+
+// creating values for role
+const roleValues = role
+  .map((role) => `('${role.title}', '${role.salary}', '${role.department_id}')`)
+  .join(",");
+
+// template string query for role table
+const roleQuery = `INSERT INTO role(title, salary, department_id) VALUE${roleValues}`;
+
+db.query(roleQuery, (err, result) => {
+  if (err) {
+    console.log(err);
+    return;
+  }
+
+  console.log("Successfully entered ROLES into role table.");
+  //   db.end();
 });
