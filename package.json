@@ -4,7 +4,9 @@
   "description": "A CLI application using node.js and sql to Create, Read, Update, and Delete Employees from a database using mySQL.",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "seed": "node src/db/seed.js"
   },
   "repository": {
     "type": "git",
