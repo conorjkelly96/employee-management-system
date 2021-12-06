@@ -41,12 +41,12 @@ const roleInfo = [
     name: "roleName",
   },
   {
-    type: "input",
+    type: "number",
     message: "Enter Role Salary",
     name: "roleSalary",
   },
   {
-    type: "input",
+    type: "number",
     message: "Enter Role Department",
     name: "roleDepartment",
   },

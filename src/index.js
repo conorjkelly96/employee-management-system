@@ -24,7 +24,7 @@ const init = async () => {
   // Whilst the session is true, prompt the questions to the user
   let inProgress = true;
 
-  const userChoice = await inquirer.prompt(userOptions);
+  let userChoice = await inquirer.prompt(userOptions);
 
   while (inProgress) {
     //   prompt userOptions
@@ -87,7 +87,6 @@ const init = async () => {
         console.log(
           `Successfully added ${insertIntoDepartment.departmentName} to department table.`
         );
-        db.end();
       });
     }
 
@@ -95,12 +94,12 @@ const init = async () => {
     else if (userChoice.userAction === "Add a role") {
       // prompt questions to user
       const insertIntoRole = await inquirer.prompt(roleInfo);
-      const roleValues = `('${insertIntoRole.title}', '${insertIntoRole.salary}', '${insertIntoRole.department_id}')`;
+      const roleValues = `('${insertIntoRole.roleName}', '${insertIntoRole.roleSalary}', '${insertIntoRole.roleDepartment}')`;
 
       // template string query for department table
-      const departmentQuery = `INSERT INTO role(title, salary, department_id) VALUE(${roleValues})`;
+      const roleQuery = `INSERT INTO role(title, salary, department_id) VALUE(${roleValues})`;
 
-      db.query(departmentQuery, (err, result) => {
+      db.query(roleQuery, (err, result) => {
         if (err) {
           console.log(err);
           return;
@@ -109,7 +108,6 @@ const init = async () => {
         console.log(
           `Successfully added $${insertIntoRole.title}', '${insertIntoRole.salary}' & '${insertIntoRole.department_id} to department table.`
         );
-        db.end();
       });
     }
 
@@ -129,6 +127,7 @@ const init = async () => {
 
     if (!wouldYouLikeToContinue.wouldYouLikeToContinue) {
       inProgress = false;
+      // db.end();
       console.log("Session closed.");
     } else {
       const userChoice = await inquirer.prompt(userOptions);
