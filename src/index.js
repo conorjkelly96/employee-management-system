@@ -1,7 +1,14 @@
 // importing dependencies - DO NOT REMOVE
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
-const { userOptions, continueProcess } = require("./questions.js");
+const {
+  userOptions,
+  continueProcess,
+  departmentInfo,
+  roleInfo,
+  employeeInfo,
+  updateEmployeeInfo,
+} = require("./questions.js");
 const { dbOptions } = require("./db/databaseConfiguration");
 const db = mysql.createConnection(dbOptions);
 const table = require("table");
@@ -64,17 +71,52 @@ const init = async () => {
 
     // if ADD A DEPARTMENT, then give the user the choice to add a department name
     else if (userChoice.userAction === "Add a department") {
-      console.log("Add a department");
+      // prompt questions to user
+      const insertIntoDepartment = await inquirer.prompt(departmentInfo);
+      const departmentValues = `("${insertIntoDepartment.departmentName}")`;
+
+      // template string query for department table
+      const departmentQuery = `INSERT INTO department(name) VALUE(${departmentValues})`;
+
+      db.query(departmentQuery, (err, result) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
+
+        console.log(
+          `Successfully added ${insertIntoDepartment.departmentName} to department table.`
+        );
+        db.end();
+      });
     }
 
     // if ADD A ROLE, then give the user the choice to add a role name
     else if (userChoice.userAction === "Add a role") {
-      console.log("Add a role");
+      // prompt questions to user
+      const insertIntoRole = await inquirer.prompt(roleInfo);
+      const roleValues = `('${insertIntoRole.title}', '${insertIntoRole.salary}', '${insertIntoRole.department_id}')`;
+
+      // template string query for department table
+      const departmentQuery = `INSERT INTO role(title, salary, department_id) VALUE(${roleValues})`;
+
+      db.query(departmentQuery, (err, result) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
+
+        console.log(
+          `Successfully added $${insertIntoRole.title}', '${insertIntoRole.salary}' & '${insertIntoRole.department_id} to department table.`
+        );
+        db.end();
+      });
     }
 
     // if ADD AN EMPLOYEE, then give the user the choice to add an employee
     else if (userChoice.userAction === "Add an employee") {
-      console.log("Add an employee");
+      const insertIntoEmployee = await inquirer.prompt(employeeInfo);
+      console.log(insertIntoEmployee);
     }
 
     // if ADD AN EMPLOYEE, then give the user the choice to add an employee
@@ -82,8 +124,8 @@ const init = async () => {
       console.log("Update Employee role");
     }
 
+    // confirm if user would still like to interact with the database
     const wouldYouLikeToContinue = await inquirer.prompt(continueProcess);
-    console.log(wouldYouLikeToContinue);
 
     if (!wouldYouLikeToContinue.wouldYouLikeToContinue) {
       inProgress = false;

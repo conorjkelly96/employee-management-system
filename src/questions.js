@@ -26,7 +26,7 @@ const continueProcess = [
 ];
 
 // question to determine if the loop should stop
-const insertIntoDepartment = [
+const departmentInfo = [
   {
     type: "input",
     message: "Enter Department Name",
@@ -34,7 +34,7 @@ const insertIntoDepartment = [
   },
 ];
 
-const insertIntoRole = [
+const roleInfo = [
   {
     type: "input",
     message: "Enter Role Name",
@@ -52,7 +52,7 @@ const insertIntoRole = [
   },
 ];
 
-const insertIntoEmployee = [
+const employeeInfo = [
   {
     type: "input",
     message: "Enter First Name",
@@ -75,10 +75,34 @@ const insertIntoEmployee = [
   },
 ];
 
+const updateEmployeeInfo = [
+  {
+    type: "input",
+    message: "Which Employee would you like to update?",
+    name: "employeeToUpdate",
+  },
+
+  {
+    type: "list",
+    message: "What action would you like to take?",
+    name: "userAction",
+    choices: [
+      "View all departments",
+      "View all roles",
+      "View all employees",
+      "Add a department",
+      "Add a role",
+      "Add an employee",
+      "Update Employee role",
+    ],
+  },
+];
+
 module.exports = {
   userOptions,
   continueProcess,
-  insertIntoDepartment,
-  insertIntoRole,
-  insertIntoEmployee,
+  departmentInfo,
+  roleInfo,
+  employeeInfo,
+  updateEmployeeInfo,
 };
