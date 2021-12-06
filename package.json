@@ -21,7 +21,8 @@
   "homepage": "https://github.com/conorjkelly96/employee-management-system#readme",
   "dependencies": {
     "inquirer": "^8.2.0",
-    "mysql2": "^2.3.3"
+    "mysql2": "^2.3.3",
+    "table": "^6.7.5"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
