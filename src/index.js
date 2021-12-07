@@ -12,12 +12,10 @@ const {
 const { dbOptions } = require("./db/databaseConfiguration");
 const db = mysql.createConnection(dbOptions);
 const table = require("table");
-const department = require("./db/data/department.js");
 const config = {
   // Predefined styles of table
   border: table.getBorderCharacters("ramac"),
 };
-// const businessQuery = `"SELECT * FROM ${}`;
 
 // initialize user interaction
 const init = async () => {
@@ -27,8 +25,6 @@ const init = async () => {
   let userChoice = await inquirer.prompt(userOptions);
 
   while (inProgress) {
-    //   prompt userOptions
-    console.log(userChoice);
     // if VIEW ALL DEPARTMENTS, then retrieve from database and display table
     if (userChoice.userAction === "View all departments") {
       db.query("SELECT * FROM department", (err, result) => {
@@ -36,10 +32,7 @@ const init = async () => {
           console.log(err);
           return;
         }
-        const rawData = JSON.stringify(result);
-        const departmentTable = table.table(rawData, config);
-        console.log(departmentTable);
-        //   db.end();
+        console.table(result);
       });
     }
 
@@ -51,8 +44,7 @@ const init = async () => {
           return;
         }
 
-        console.log(result);
-        //   db.end();
+        console.table(result);
       });
     }
 
@@ -64,8 +56,7 @@ const init = async () => {
           return;
         }
 
-        console.log(result);
-        //   db.end();
+        console.table(result);
       });
     }
 
@@ -96,7 +87,7 @@ const init = async () => {
       const insertIntoRole = await inquirer.prompt(roleInfo);
       const roleValues = `('${insertIntoRole.roleName}', '${insertIntoRole.roleSalary}', '${insertIntoRole.roleDepartment}')`;
 
-      // template string query for department table
+      // template string query for role table
       const roleQuery = `INSERT INTO role(title, salary, department_id) VALUE(${roleValues})`;
 
       db.query(roleQuery, (err, result) => {
@@ -106,20 +97,52 @@ const init = async () => {
         }
 
         console.log(
-          `Successfully added $${insertIntoRole.title}', '${insertIntoRole.salary}' & '${insertIntoRole.department_id} to department table.`
+          `Successfully added '${insertIntoRole.roleName}' to role table.`
         );
       });
     }
 
     // if ADD AN EMPLOYEE, then give the user the choice to add an employee
     else if (userChoice.userAction === "Add an employee") {
+      // prompt questions to user
       const insertIntoEmployee = await inquirer.prompt(employeeInfo);
-      console.log(insertIntoEmployee);
+      const employeeValues = `('${insertIntoEmployee.first_name}', '${insertIntoEmployee.last_name}', '${insertIntoEmployee.role_id}','${insertIntoEmployee.manager_id}', )`;
+
+      // template string query for department table
+      const employeeQuery = `INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUE(${employeeValues})`;
+
+      db.query(employeeQuery, (err, result) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
+
+        console.log(
+          `Successfully added  '${insertIntoEmployee.first_name}' '${insertIntoEmployee.last_name}'to employee table.`
+        );
+      });
     }
 
     // if ADD AN EMPLOYEE, then give the user the choice to add an employee
     else if (userChoice.userAction === "Update Employee role") {
       console.log("Update Employee role");
+      //prompt questions to user
+      const updatesToEmployeeRecord = await inquirer.prompt(updateEmployeeInfo);
+      const employeeUpdateValues = `('${updatesToEmployeeRecord.first_name}', '${insertIntoEmployee.last_name}', '${insertIntoEmployee.role_id}','${insertIntoEmployee.manager_id}', )`;
+
+      // template string query for department table
+      const employeeQuery = `INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUE(${employeeUpdateValues})`;
+
+      db.query(employeeQuery, (err, result) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
+
+        console.log(
+          `Successfully added  '${insertIntoEmployee.first_name}' '${insertIntoEmployee.last_name}'to employee table.`
+        );
+      });
     }
 
     // confirm if user would still like to interact with the database
@@ -127,7 +150,7 @@ const init = async () => {
 
     if (!wouldYouLikeToContinue.wouldYouLikeToContinue) {
       inProgress = false;
-      // db.end();
+      db.end();
       console.log("Session closed.");
     } else {
       const userChoice = await inquirer.prompt(userOptions);

@@ -1,3 +1,5 @@
+const { getEmployeeBy, getDepartmentList } = require("./utils");
+
 // question set to prompt options to the user
 const userOptions = [
   {

@@ -1,15 +1,15 @@
 // take the employee name from updateEmployeeInfo query, search database and retrieve id
-const getEmployeeBy = (updateEmployeeInfo) => {
+const getEmployee = (updateEmployeeInfo) => {
   //
 };
 
-const convertDepartmentNameToID = (departmentName) => {
+const getDepartmentList = (departmentName) => {
   // get the department name
-  // query the department table to retrive the department id
+  // query the department table to retrieve the department id
   // return department id
 };
 
 module.exports = {
-  getEmployeeBy,
-  convertDepartmentNameToID,
+  getEmployee,
+  getDepartmentList,
 };
