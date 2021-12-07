@@ -1,15 +1,40 @@
+// importing dependencies - DO NOT REMOVE
+const mysql = require("mysql2");
+const { dbOptions } = require("./db/databaseConfiguration");
+const db = mysql.createConnection(dbOptions);
+
 // take the employee name from updateEmployeeInfo query, search database and retrieve id
-const getEmployee = (updateEmployeeInfo) => {
-  //
+const getEmployeeList = () => {
+  const employeeList = `SELECT name FROM employee;`;
+  // get the department name
+  db.query(employeeList, (err, result) => {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    const employeeValues = [];
+    result.forEach((employeeName) =>
+      console.log(employeeValues.push(employeeName.name))
+    );
+  });
 };
 
-const getDepartmentList = (departmentName) => {
+const getDepartmentList = () => {
+  const departmentList = `SELECT name FROM department;`;
   // get the department name
-  // query the department table to retrieve the department id
-  // return department id
+  db.query(departmentList, (err, result) => {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    const departmentValues = [];
+    result.forEach((departmentName) =>
+      departmentValues.join(",").push(departmentName.name)
+    );
+  });
 };
 
 module.exports = {
-  getEmployee,
+  getEmployeeList,
   getDepartmentList,
 };

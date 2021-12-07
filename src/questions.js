@@ -1,4 +1,4 @@
-const { getEmployeeBy, getDepartmentList } = require("./utils");
+const { getEmployeeList, getDepartmentList } = require("./utils");
 
 // question set to prompt options to the user
 const userOptions = [
@@ -48,9 +48,10 @@ const roleInfo = [
     name: "roleSalary",
   },
   {
-    type: "number",
+    type: "list",
     message: "Enter Role Department",
     name: "roleDepartment",
+    choices: getDepartmentList(),
   },
 ];
 
