@@ -14,6 +14,7 @@ const userOptions = [
       "Add a role",
       "Add an employee",
       "Update Employee role",
+      "Quit Session",
     ],
   },
 ];

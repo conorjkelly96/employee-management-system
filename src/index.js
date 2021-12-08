@@ -9,8 +9,9 @@ const {
   employeeInfo,
   updateEmployeeInfo,
 } = require("./questions.js");
-const { dbOptions } = require("./db/databaseConfiguration");
-const db = mysql.createConnection(dbOptions);
+const Db = require("./lib/Db");
+// const { dbOptions } = require("./db/databaseConfiguration");
+// const db = mysql.createConnection(dbOptions);
 const table = require("table");
 const config = {
   // Predefined styles of table
@@ -19,6 +20,15 @@ const config = {
 
 // initialize user interaction
 const init = async () => {
+  const db = new Db({
+    host: process.env.DB_HOST || "localhost",
+    user: process.env.DB_USER || "root",
+    password: process.env.DB_PASSWORD || "Password123!!",
+    database: process.env.DB_NAME || "company_db",
+  });
+
+  await db.start();
+
   // Whilst the session is true, prompt the questions to the user
   let inProgress = true;
 
@@ -27,41 +37,24 @@ const init = async () => {
   while (inProgress) {
     // if VIEW ALL DEPARTMENTS, then retrieve from database and display table
     if (userChoice.userAction === "View all departments") {
-      db.query("SELECT * FROM department", (err, result) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-        console.table(result);
-      });
+      const departments = await db.query("SELECT * FROM department");
+      console.table(departments);
     }
 
     // if VIEW ALL ROLES, then retrieve from database and display table
-    else if (userChoice.userAction === "View all roles") {
-      db.query("SELECT * FROM role", (err, result) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-
-        console.table(result);
-      });
+    if (userChoice.userAction === "View all roles") {
+      const roles = await db.query("SELECT * FROM role");
+      console.table(roles);
     }
 
     // if VIEW ALL EMPLOYEES, then retrieve from database and display table
-    else if (userChoice.userAction === "View all employees") {
-      db.query("SELECT * FROM employee", (err, result) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-
-        console.table(result);
-      });
+    if (userChoice.userAction === "View all employees") {
+      const employees = await db.query("SELECT * FROM employee");
+      console.table(employees);
     }
 
     // if ADD A DEPARTMENT, then give the user the choice to add a department name
-    else if (userChoice.userAction === "Add a department") {
+    if (userChoice.userAction === "Add a department") {
       // prompt questions to user
       const insertIntoDepartment = await inquirer.prompt(departmentInfo);
       const departmentValues = `("${insertIntoDepartment.departmentName}")`;
@@ -82,7 +75,7 @@ const init = async () => {
     }
 
     // if ADD A ROLE, then give the user the choice to add a role name
-    else if (userChoice.userAction === "Add a role") {
+    if (userChoice.userAction === "Add a role") {
       // prompt questions to user
       const insertIntoRole = await inquirer.prompt(roleInfo);
       const roleValues = `('${insertIntoRole.roleName}', '${insertIntoRole.roleSalary}', '${insertIntoRole.roleDepartment}')`;
@@ -103,7 +96,7 @@ const init = async () => {
     }
 
     // if ADD AN EMPLOYEE, then give the user the choice to add an employee
-    else if (userChoice.userAction === "Add an employee") {
+    if (userChoice.userAction === "Add an employee") {
       // prompt questions to user
       const insertIntoEmployee = await inquirer.prompt(employeeInfo);
       const employeeValues = `('${insertIntoEmployee.first_name}', '${insertIntoEmployee.last_name}', '${insertIntoEmployee.role_id}','${insertIntoEmployee.manager_id}', )`;
@@ -124,7 +117,7 @@ const init = async () => {
     }
 
     // if ADD AN EMPLOYEE, then give the user the choice to add an employee
-    else if (userChoice.userAction === "Update Employee role") {
+    if (userChoice.userAction === "Update Employee role") {
       console.log("Update Employee role");
       //prompt questions to user
       const updatesToEmployeeRecord = await inquirer.prompt(updateEmployeeInfo);
@@ -150,7 +143,7 @@ const init = async () => {
 
     if (!wouldYouLikeToContinue.wouldYouLikeToContinue) {
       inProgress = false;
-      db.end();
+      db.stop();
       console.log("Session closed.");
     } else {
       const userChoice = await inquirer.prompt(userOptions);
