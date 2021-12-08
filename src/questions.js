@@ -37,25 +37,6 @@ const departmentInfo = [
   },
 ];
 
-const roleInfo = [
-  {
-    type: "input",
-    message: "Enter Role Name",
-    name: "roleName",
-  },
-  {
-    type: "number",
-    message: "Enter Role Salary",
-    name: "roleSalary",
-  },
-  {
-    type: "list",
-    message: "Enter Role Department",
-    name: "roleDepartment",
-    choices: getDepartmentList(),
-  },
-];
-
 const employeeInfo = [
   {
     type: "input",
@@ -106,7 +87,6 @@ module.exports = {
   userOptions,
   continueProcess,
   departmentInfo,
-  roleInfo,
   employeeInfo,
   updateEmployeeInfo,
 };

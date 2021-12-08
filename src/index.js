@@ -5,8 +5,6 @@ const {
   userOptions,
   continueProcess,
   departmentInfo,
-  roleInfo,
-  employeeInfo,
   updateEmployeeInfo,
 } = require("./questions.js");
 const Db = require("./lib/Db");
@@ -55,65 +53,96 @@ const init = async () => {
 
     // if ADD A DEPARTMENT, then give the user the choice to add a department name
     if (userChoice.userAction === "Add a department") {
-      // prompt questions to user
-      const insertIntoDepartment = await inquirer.prompt(departmentInfo);
-      const departmentValues = `("${insertIntoDepartment.departmentName}")`;
+      const { name } = await inquirer.prompt(departmentInfo);
 
-      // template string query for department table
-      const departmentQuery = `INSERT INTO department(name) VALUE(${departmentValues})`;
-
-      db.query(departmentQuery, (err, result) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-
-        console.log(
-          `Successfully added ${insertIntoDepartment.departmentName} to department table.`
-        );
-      });
+      await db.query(`INSERT INTO department(name) VALUES('${name}')`);
     }
 
     // if ADD A ROLE, then give the user the choice to add a role name
     if (userChoice.userAction === "Add a role") {
-      // prompt questions to user
-      const insertIntoRole = await inquirer.prompt(roleInfo);
-      const roleValues = `('${insertIntoRole.roleName}', '${insertIntoRole.roleSalary}', '${insertIntoRole.roleDepartment}')`;
+      const generateDepartmentChoices = (departmentsFromDB) => {
+        return departmentsFromDB.map((department) => {
+          return {
+            name: department.name,
+            value: department.id,
+          };
+        });
+      };
 
-      // template string query for role table
-      const roleQuery = `INSERT INTO role(title, salary, department_id) VALUE(${roleValues})`;
+      const departments = await db.query("SELECT * FROM department");
 
-      db.query(roleQuery, (err, result) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
+      const roleQuestions = [
+        {
+          type: "list",
+          message: "Please select a department:",
+          name: "departmentId",
+          choices: generateDepartmentChoices(departments),
+        },
+        {
+          type: "input",
+          message: "Please enter role title:",
+          name: "title",
+        },
+        {
+          type: "input",
+          message: "Please enter role salary:",
+          name: "salary",
+        },
+      ];
 
-        console.log(
-          `Successfully added '${insertIntoRole.roleName}' to role table.`
-        );
-      });
+      const { departmentId, title, salary } = await inquirer.prompt(
+        roleQuestions
+      );
+
+      await db.query(
+        `INSERT INTO role (title, salary, department_id) VALUES("${title}", ${salary}, ${departmentId})`
+      );
     }
 
     // if ADD AN EMPLOYEE, then give the user the choice to add an employee
     if (userChoice.userAction === "Add an employee") {
+      const generateRoleChoices = (rolesFromDB) => {
+        return rolesFromDB.map((role) => {
+          return {
+            name: role.name,
+            value: role.id,
+          };
+        });
+      };
+
+      const roles = await db.query("SELECT * FROM role");
+
+      const employeeInfo = [
+        {
+          type: "input",
+          message: "Enter First Name",
+          name: "firstName",
+        },
+        {
+          type: "input",
+          message: "Enter Last Name",
+          name: "lastName",
+        },
+        {
+          type: "list",
+          message: "Please select a role",
+          name: "employeeRole",
+          choices: generateRoleChoices(roles),
+        },
+        {
+          type: "input",
+          message: "Enter Manager Name",
+          name: "employeeManager",
+        },
+      ];
       // prompt questions to user
-      const insertIntoEmployee = await inquirer.prompt(employeeInfo);
-      const employeeValues = `('${insertIntoEmployee.first_name}', '${insertIntoEmployee.last_name}', '${insertIntoEmployee.role_id}','${insertIntoEmployee.manager_id}', )`;
+      const { firstName, lastName, employeeRole, employeeManager } =
+        await inquirer.prompt(employeeInfo);
 
       // template string query for department table
-      const employeeQuery = `INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUE(${employeeValues})`;
-
-      db.query(employeeQuery, (err, result) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-
-        console.log(
-          `Successfully added  '${insertIntoEmployee.first_name}' '${insertIntoEmployee.last_name}'to employee table.`
-        );
-      });
+      await db.query(
+        `INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUE('${firstName}', '${lastName}', '${employeeRole}','${employeeManager}')`
+      );
     }
 
     // if ADD AN EMPLOYEE, then give the user the choice to add an employee
@@ -123,20 +152,16 @@ const init = async () => {
       const updatesToEmployeeRecord = await inquirer.prompt(updateEmployeeInfo);
       const employeeUpdateValues = `('${updatesToEmployeeRecord.first_name}', '${insertIntoEmployee.last_name}', '${insertIntoEmployee.role_id}','${insertIntoEmployee.manager_id}', )`;
 
-      // template string query for department table
-      const employeeQuery = `INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUE(${employeeUpdateValues})`;
-
-      db.query(employeeQuery, (err, result) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-
-        console.log(
-          `Successfully added  '${insertIntoEmployee.first_name}' '${insertIntoEmployee.last_name}'to employee table.`
-        );
-      });
+      await db.query(
+        `INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUE(${employeeUpdateValues})`
+      );
     }
+
+    // if (userChoice.userAction === "Quit Session") {
+    //   inProgress = false;
+    //   db.stop();
+    //   console.log("Session closed.");
+    // }
 
     // confirm if user would still like to interact with the database
     const wouldYouLikeToContinue = await inquirer.prompt(continueProcess);
@@ -147,7 +172,7 @@ const init = async () => {
       console.log("Session closed.");
     } else {
       const userChoice = await inquirer.prompt(userOptions);
-      console.log(userChoice);
+      console.log("if you want to continue - ", userChoice);
     }
 
     // prompt main questions again
