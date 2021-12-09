@@ -30,24 +30,29 @@ const init = async () => {
   // Whilst the session is true, prompt the questions to the user
   let inProgress = true;
 
-  let userChoice = await inquirer.prompt(userOptions);
+  let results;
 
   while (inProgress) {
+    let userChoice = await inquirer.prompt(userOptions);
+
     // if VIEW ALL DEPARTMENTS, then retrieve from database and display table
     if (userChoice.userAction === "View all departments") {
       const departments = await db.query("SELECT * FROM department");
+      results = departments;
       console.table(departments);
     }
 
     // if VIEW ALL ROLES, then retrieve from database and display table
     if (userChoice.userAction === "View all roles") {
       const roles = await db.query("SELECT * FROM role");
+      results = roles;
       console.table(roles);
     }
 
     // if VIEW ALL EMPLOYEES, then retrieve from database and display table
     if (userChoice.userAction === "View all employees") {
       const employees = await db.query("SELECT * FROM employee");
+      results = employees;
       console.table(employees);
     }
 
@@ -157,22 +162,11 @@ const init = async () => {
       );
     }
 
-    // if (userChoice.userAction === "Quit Session") {
-    //   inProgress = false;
-    //   db.stop();
-    //   console.log("Session closed.");
-    // }
-
     // confirm if user would still like to interact with the database
-    const wouldYouLikeToContinue = await inquirer.prompt(continueProcess);
-
-    if (!wouldYouLikeToContinue.wouldYouLikeToContinue) {
+    if (userChoice.userAction === "Quit Session") {
       inProgress = false;
       db.stop();
       console.log("Session closed.");
-    } else {
-      const userChoice = await inquirer.prompt(userOptions);
-      console.log("if you want to continue - ", userChoice);
     }
 
     // prompt main questions again
