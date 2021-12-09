@@ -109,7 +109,7 @@ const init = async () => {
       const generateRoleChoices = (rolesFromDB) => {
         return rolesFromDB.map((role) => {
           return {
-            name: role.name,
+            name: role.title,
             value: role.id,
           };
         });
@@ -143,6 +143,8 @@ const init = async () => {
       // prompt questions to user
       const { firstName, lastName, employeeRole, employeeManager } =
         await inquirer.prompt(employeeInfo);
+
+      console.log(employeeRole);
 
       // template string query for department table
       await db.query(
