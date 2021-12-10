@@ -1,3 +1,5 @@
+// use the class here to refactor
+
 // importing dependencies - DO NOT REMOVE
 const mysql = require("mysql2");
 const department = require("./data/department");

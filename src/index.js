@@ -135,14 +135,21 @@ const init = async () => {
           choices: generateRoleChoices(roles),
         },
         {
+          // confirm manager query
+        },
+        {
           type: "input",
           message: "Enter Manager Name",
           name: "employeeManager",
         },
       ];
       // prompt questions to user
-      const { firstName, lastName, employeeRole, employeeManager } =
-        await inquirer.prompt(employeeInfo);
+      const {
+        firstName,
+        lastName,
+        employeeRole,
+        employeeManager = null,
+      } = await inquirer.prompt(employeeInfo);
 
       console.log(employeeRole);
 
