@@ -4,37 +4,25 @@ const { dbOptions } = require("./db/databaseConfiguration");
 const db = mysql.createConnection(dbOptions);
 
 // take the employee name from updateEmployeeInfo query, search database and retrieve id
-const getEmployeeList = () => {
-  // const employeeList = `SELECT name FROM employee;`;
-  // // get the department name
-  // db.query(employeeList, (err, result) => {
-  //   if (err) {
-  //     console.log(err);
-  //     return;
-  //   }
-  //   const employeeValues = [];
-  //   result.forEach((employeeName) =>
-  //     console.log(employeeValues.push(employeeName.name))
-  //   );
-  // });
+const generateRoleChoices = (rolesFromDB) => {
+  return rolesFromDB.map((role) => {
+    return {
+      name: role.title,
+      value: role.id,
+    };
+  });
 };
 
-const getDepartmentList = () => {
-  // const departmentList = `SELECT name FROM department;`;
-  // // get the department name
-  // db.query(departmentList, (err, result) => {
-  //   if (err) {
-  //     console.log(err);
-  //     return;
-  //   }
-  //   const departmentValues = [];
-  //   result.forEach((departmentName) =>
-  //     departmentValues.join(",").push(departmentName.name)
-  //   );
-  // });
+const generateEmployeeChoices = (employeeFromDB) => {
+  return employeeFromDB.map((employee) => {
+    return {
+      name: `${employee.first_name} ${employee.last_name}`,
+      value: employee.id,
+    };
+  });
 };
 
 module.exports = {
-  getEmployeeList,
-  getDepartmentList,
+  generateRoleChoices,
+  generateEmployeeChoices,
 };

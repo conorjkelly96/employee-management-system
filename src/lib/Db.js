@@ -35,12 +35,12 @@ class Db {
   query(sqlQuery) {
     return new Promise((resolve, reject) => {
       this.connection.query(sqlQuery, (err, result) => {
-        if (err) {
-          console.error(`[ERROR]: ${err.message}`);
-          return reject(err.message);
+        try {
+          resolve(result);
+        } catch (error) {
+          console.error(`[ERROR]: ${error.message}`);
+          return reject(error.message);
         }
-
-        resolve(result);
       });
     });
   }

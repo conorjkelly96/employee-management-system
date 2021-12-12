@@ -3,14 +3,12 @@ const mysql = require("mysql2");
 const inquirer = require("inquirer");
 const {
   userOptions,
-  continueProcess,
   departmentInfo,
   updateEmployeeInfo,
 } = require("./questions.js");
 const Db = require("./lib/Db");
-// const { dbOptions } = require("./db/databaseConfiguration");
-// const db = mysql.createConnection(dbOptions);
 const table = require("table");
+const { generateRoleChoices, generateEmployeeChoices } = require("./utils.js");
 const config = {
   // Predefined styles of table
   border: table.getBorderCharacters("ramac"),
@@ -106,16 +104,8 @@ const init = async () => {
 
     // if ADD AN EMPLOYEE, then give the user the choice to add an employee
     if (userChoice.userAction === "Add an employee") {
-      const generateRoleChoices = (rolesFromDB) => {
-        return rolesFromDB.map((role) => {
-          return {
-            name: role.title,
-            value: role.id,
-          };
-        });
-      };
-
       const roles = await db.query("SELECT * FROM role");
+      const employees = await db.query("SELECT * FROM  employee");
 
       const employeeInfo = [
         {
@@ -135,12 +125,18 @@ const init = async () => {
           choices: generateRoleChoices(roles),
         },
         {
-          // confirm manager query
+          type: "confirm",
+          name: "managerQuery",
+          message: "Does the employee have a manager?",
+          default: null,
         },
         {
-          type: "input",
-          message: "Enter Manager Name",
+          type: "list",
           name: "employeeManager",
+          message: "Enter Manager Name:",
+          choices: generateEmployeeChoices(employees),
+          default: null,
+          when: (employeeInfo) => employeeInfo.managerQuery === true,
         },
       ];
       // prompt questions to user
@@ -151,8 +147,6 @@ const init = async () => {
         employeeManager = null,
       } = await inquirer.prompt(employeeInfo);
 
-      console.log(employeeRole);
-
       // template string query for department table
       await db.query(
         `INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUE('${firstName}', '${lastName}', '${employeeRole}','${employeeManager}')`
@@ -161,7 +155,6 @@ const init = async () => {
 
     // if ADD AN EMPLOYEE, then give the user the choice to add an employee
     if (userChoice.userAction === "Update Employee role") {
-      console.log("Update Employee role");
       //prompt questions to user
       const updatesToEmployeeRecord = await inquirer.prompt(updateEmployeeInfo);
       const employeeUpdateValues = `('${updatesToEmployeeRecord.first_name}', '${insertIntoEmployee.last_name}', '${insertIntoEmployee.role_id}','${insertIntoEmployee.manager_id}', )`;
