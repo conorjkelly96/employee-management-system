@@ -66,21 +66,3 @@ db.query(roleQuery, (err, result) => {
   console.log("Successfully entered ROLES into role table.");
   //   db.end();
 });
-
-// TESTING FOR DATABASE CONNECTION USE ONLY
-// const getDepartmentList = () => {
-//   const departmentList = `SELECT name FROM department;`;
-//   // get the department name
-//   db.query(departmentList, (err, result) => {
-//     if (err) {
-//       console.log(err);
-//       return;
-//     }
-//     const departmentValues = [];
-//     result.forEach((departmentName) =>
-//       console.log(departmentValues.push(departmentName.name))
-//     );
-//   });
-// };
-
-// getDepartmentList();

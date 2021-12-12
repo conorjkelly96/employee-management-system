@@ -1,11 +1,7 @@
 // importing dependencies - DO NOT REMOVE
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
-const {
-  userOptions,
-  departmentInfo,
-  updateEmployeeInfo,
-} = require("./questions.js");
+const { userOptions, departmentInfo, deleteRecord } = require("./questions.js");
 const Db = require("./lib/Db");
 const table = require("table");
 const {
@@ -21,7 +17,7 @@ const {
   employeeQuery,
   roleQuery,
   departmentQuery,
-  addDepartment,
+  employeeByManager,
 } = require("./db/data/queries");
 
 // initialize user interaction
@@ -62,7 +58,6 @@ const init = async () => {
     // if ADD A DEPARTMENT, then give the user the choice to add a department name
     if (userAction === "Add a department") {
       const { departmentName } = await inquirer.prompt(departmentInfo);
-      console.log(departmentName);
 
       await db.query(
         `INSERT INTO department (name) VALUES ('${departmentName}');`
@@ -160,6 +155,31 @@ const init = async () => {
       // template string query for department table
     }
 
+    if (userAction === "Update Employee Manager") {
+      const employees = await db.query("SELECT * FROM  employee");
+      const updateManager = [
+        {
+          type: "list",
+          message: "Select Employee",
+          name: "employeeChoice",
+          choices: generateEmployeeChoices(employees),
+        },
+        {
+          type: "list",
+          message: "Select New Manager",
+          name: "newManager",
+          choices: generateEmployeeChoices(employees),
+        },
+      ];
+
+      const { employeeChoice, newManager } = await inquirer.prompt(
+        updateManager
+      );
+
+      await db.query(
+        `UPDATE company_db.employee SET manager_id = '${newManager}' WHERE (id = '${employeeChoice}');`
+      );
+    }
     // if ADD AN EMPLOYEE, then give the user the choice to add an employee
     if (userAction === "Update Employee role") {
       //prompt questions to user
@@ -184,11 +204,75 @@ const init = async () => {
         updateEmployeeInfo
       );
 
-      console.log(employeeToUpdate, employeeRole);
-
       await db.query(
         `UPDATE company_db.employee SET role_id = '${employeeRole}' WHERE (id = '${employeeToUpdate}');`
       );
+    }
+
+    // if ADD AN EMPLOYEE, then give the user the choice to add an employee
+    if (userAction === "View Employee by Manager") {
+      //prompt questions to user
+      const viewEmployeeByManager = await db.query(employeeByManager);
+      console.table(viewEmployeeByManager);
+    }
+
+    // if ADD AN EMPLOYEE, then give the user the choice to add an employee
+    if (userAction === "Delete Record") {
+      const roles = await db.query("SELECT * FROM role");
+      const employees = await db.query("SELECT * FROM  employee");
+      const department = await db.query("SELECT * FROM department");
+      //prompt questions to user
+      const { recordSelection } = await inquirer.prompt(deleteRecord);
+
+      if (recordSelection === "Delete employee") {
+        const employeeList = [
+          {
+            type: "list",
+            message: "Select an employee to delete:",
+            name: "employeeToDelete",
+            choices: generateEmployeeChoices(employees),
+          },
+        ];
+        const { employeeToDelete } = await inquirer.prompt(employeeList);
+
+        await db.query(
+          `DELETE FROM company_db.employee WHERE (id = '${employeeToDelete}');`
+        );
+        console.log(`Employee successfully deleted`);
+      }
+
+      if (recordSelection === "Delete role") {
+        const roleList = [
+          {
+            type: "list",
+            message: "Select a role to delete:",
+            name: "roleToDelete",
+            choices: generateRoleChoices(roles),
+          },
+        ];
+        const { roleToDelete } = await inquirer.prompt(roleList);
+
+        await db.query(
+          `DELETE FROM company_db.role WHERE (id = '${roleToDelete}');`
+        );
+        console.log(`Role successfully deleted`);
+      }
+
+      if (recordSelection === "Delete Department") {
+        const departmentList = [
+          {
+            type: "list",
+            message: "Select a role to delete:",
+            name: "departmentToDelete",
+            choices: generateDepartmentChoices(department),
+          },
+        ];
+        const { departmentToDelete } = await inquirer.prompt(departmentList);
+        await db.query(
+          `DELETE FROM company_db.department WHERE (id = '${departmentToDelete}');`
+        );
+        console.log(`Department successfully deleted`);
+      }
     }
 
     // confirm if user would still like to interact with the database

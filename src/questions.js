@@ -1,9 +1,3 @@
-const {
-  getEmployeeList,
-  getDepartmentList,
-  generateEmployeeChoices,
-} = require("./utils");
-
 // question set to prompt options to the user
 const userOptions = [
   {
@@ -19,16 +13,10 @@ const userOptions = [
       "Add an employee",
       "Update Employee role",
       "Quit Session",
+      "Update Employee Manager",
+      "View Employee by Manager",
+      "Delete Record",
     ],
-  },
-];
-
-// question to determine if the loop should stop
-const continueProcess = [
-  {
-    type: "confirm",
-    message: "Would you like to continue?",
-    name: "wouldYouLikeToContinue",
   },
 ];
 
@@ -64,9 +52,18 @@ const employeeInfo = [
   },
 ];
 
+const deleteRecord = [
+  {
+    type: "list",
+    message: "Which record type would you like to delete?",
+    name: "recordSelection",
+    choices: ["Delete Department", "Delete role", "Delete employee"],
+  },
+];
+
 module.exports = {
   userOptions,
-  continueProcess,
   departmentInfo,
   employeeInfo,
+  deleteRecord,
 };
