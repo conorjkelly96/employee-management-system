@@ -22,7 +22,17 @@ const generateEmployeeChoices = (employeeFromDB) => {
   });
 };
 
+const generateDepartmentChoices = (departmentFromDB) => {
+  return departmentFromDB.map((department) => {
+    return {
+      name: department.name,
+      value: department.id,
+    };
+  });
+};
+
 module.exports = {
   generateRoleChoices,
   generateEmployeeChoices,
+  generateDepartmentChoices,
 };

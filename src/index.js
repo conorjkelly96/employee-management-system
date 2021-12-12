@@ -8,11 +8,21 @@ const {
 } = require("./questions.js");
 const Db = require("./lib/Db");
 const table = require("table");
-const { generateRoleChoices, generateEmployeeChoices } = require("./utils.js");
+const {
+  generateRoleChoices,
+  generateEmployeeChoices,
+  generateDepartmentChoices,
+} = require("./utils.js");
 const config = {
   // Predefined styles of table
   border: table.getBorderCharacters("ramac"),
 };
+const {
+  employeeQuery,
+  roleQuery,
+  departmentQuery,
+  addDepartment,
+} = require("./db/data/queries");
 
 // initialize user interaction
 const init = async () => {
@@ -28,51 +38,40 @@ const init = async () => {
   // Whilst the session is true, prompt the questions to the user
   let inProgress = true;
 
-  let results;
-
   while (inProgress) {
-    let userChoice = await inquirer.prompt(userOptions);
+    let { userAction } = await inquirer.prompt(userOptions);
 
     // if VIEW ALL DEPARTMENTS, then retrieve from database and display table
-    if (userChoice.userAction === "View all departments") {
-      const departments = await db.query("SELECT * FROM department");
-      results = departments;
+    if (userAction === "View all departments") {
+      const departments = await db.query(departmentQuery);
       console.table(departments);
     }
 
     // if VIEW ALL ROLES, then retrieve from database and display table
-    if (userChoice.userAction === "View all roles") {
-      const roles = await db.query("SELECT * FROM role");
-      results = roles;
+    if (userAction === "View all roles") {
+      const roles = await db.query(roleQuery);
       console.table(roles);
     }
 
     // if VIEW ALL EMPLOYEES, then retrieve from database and display table
-    if (userChoice.userAction === "View all employees") {
-      const employees = await db.query("SELECT * FROM employee");
-      results = employees;
+    if (userAction === "View all employees") {
+      const employees = await db.query(employeeQuery);
       console.table(employees);
     }
 
     // if ADD A DEPARTMENT, then give the user the choice to add a department name
-    if (userChoice.userAction === "Add a department") {
-      const { name } = await inquirer.prompt(departmentInfo);
+    if (userAction === "Add a department") {
+      const { departmentName } = await inquirer.prompt(departmentInfo);
+      console.log(departmentName);
 
-      await db.query(`INSERT INTO department(name) VALUES('${name}')`);
+      await db.query(
+        `INSERT INTO department (name) VALUES ('${departmentName}');`
+      );
     }
 
     // if ADD A ROLE, then give the user the choice to add a role name
-    if (userChoice.userAction === "Add a role") {
-      const generateDepartmentChoices = (departmentsFromDB) => {
-        return departmentsFromDB.map((department) => {
-          return {
-            name: department.name,
-            value: department.id,
-          };
-        });
-      };
-
-      const departments = await db.query("SELECT * FROM department");
+    if (userAction === "Add a role") {
+      const departments = await db.query(departmentQuery);
 
       const roleQuestions = [
         {
@@ -103,7 +102,7 @@ const init = async () => {
     }
 
     // if ADD AN EMPLOYEE, then give the user the choice to add an employee
-    if (userChoice.userAction === "Add an employee") {
+    if (userAction === "Add an employee") {
       const roles = await db.query("SELECT * FROM role");
       const employees = await db.query("SELECT * FROM  employee");
 
@@ -139,6 +138,7 @@ const init = async () => {
           when: (employeeInfo) => employeeInfo.managerQuery === true,
         },
       ];
+
       // prompt questions to user
       const {
         firstName,
@@ -147,31 +147,56 @@ const init = async () => {
         employeeManager = null,
       } = await inquirer.prompt(employeeInfo);
 
+      if (!employeeManager) {
+        await db.query(
+          `INSERT INTO employee(first_name, last_name, role_id) VALUE('${firstName}', '${lastName}', '${employeeRole}')`
+        );
+      } else {
+        await db.query(
+          `INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUE('${firstName}', '${lastName}', '${employeeRole}','${employeeManager}')`
+        );
+      }
+
       // template string query for department table
-      await db.query(
-        `INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUE('${firstName}', '${lastName}', '${employeeRole}','${employeeManager}')`
-      );
     }
 
     // if ADD AN EMPLOYEE, then give the user the choice to add an employee
-    if (userChoice.userAction === "Update Employee role") {
+    if (userAction === "Update Employee role") {
       //prompt questions to user
-      const updatesToEmployeeRecord = await inquirer.prompt(updateEmployeeInfo);
-      const employeeUpdateValues = `('${updatesToEmployeeRecord.first_name}', '${insertIntoEmployee.last_name}', '${insertIntoEmployee.role_id}','${insertIntoEmployee.manager_id}', )`;
+      const roles = await db.query("SELECT * FROM role");
+      const employees = await db.query("SELECT * FROM  employee");
+      const updateEmployeeInfo = [
+        {
+          type: "list",
+          message: "Select an employee to update their role",
+          name: "employeeToUpdate",
+          choices: generateEmployeeChoices(employees),
+        },
+        {
+          type: "list",
+          message: "Please select a role",
+          name: "employeeRole",
+          choices: generateRoleChoices(roles),
+        },
+      ];
+
+      const { employeeToUpdate, employeeRole } = await inquirer.prompt(
+        updateEmployeeInfo
+      );
+
+      console.log(employeeToUpdate, employeeRole);
 
       await db.query(
-        `INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUE(${employeeUpdateValues})`
+        `UPDATE company_db.employee SET role_id = '${employeeRole}' WHERE (id = '${employeeToUpdate}');`
       );
     }
 
     // confirm if user would still like to interact with the database
-    if (userChoice.userAction === "Quit Session") {
+    if (userAction === "Quit Session") {
       inProgress = false;
       db.stop();
       console.log("Session closed.");
     }
-
-    // prompt main questions again
   }
 };
 

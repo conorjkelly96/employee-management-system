@@ -1,4 +1,8 @@
-const { getEmployeeList, getDepartmentList } = require("./utils");
+const {
+  getEmployeeList,
+  getDepartmentList,
+  generateEmployeeChoices,
+} = require("./utils");
 
 // question set to prompt options to the user
 const userOptions = [
@@ -60,33 +64,9 @@ const employeeInfo = [
   },
 ];
 
-const updateEmployeeInfo = [
-  {
-    type: "input",
-    message: "Which Employee would you like to update?",
-    name: "employeeToUpdate",
-  },
-
-  {
-    type: "list",
-    message: "What action would you like to take?",
-    name: "userAction",
-    choices: [
-      "View all departments",
-      "View all roles",
-      "View all employees",
-      "Add a department",
-      "Add a role",
-      "Add an employee",
-      "Update Employee role",
-    ],
-  },
-];
-
 module.exports = {
   userOptions,
   continueProcess,
   departmentInfo,
   employeeInfo,
-  updateEmployeeInfo,
 };
