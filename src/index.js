@@ -92,7 +92,7 @@ const init = async () => {
       );
 
       await db.query(
-        `INSERT INTO role (title, salary, department_id) VALUES("${title}", ${salary}, ${departmentId})`
+        `INSERT INTO role(title, salary, department_id) VALUES('${title}', '${salary}', '${departmentId}')`
       );
     }
 
