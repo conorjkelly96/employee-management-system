@@ -180,7 +180,7 @@ const init = async () => {
         `UPDATE company_db.employee SET manager_id = '${newManager}' WHERE (id = '${employeeChoice}');`
       );
     }
-    // if ADD AN EMPLOYEE, then give the user the choice to add an employee
+    // if UPDATE EMPLOYEE ROLE, then give the user the choice to update the role of an employee
     if (userAction === "Update Employee role") {
       //prompt questions to user
       const roles = await db.query("SELECT * FROM role");
@@ -209,14 +209,14 @@ const init = async () => {
       );
     }
 
-    // if ADD AN EMPLOYEE, then give the user the choice to add an employee
+    // if View Employee by Manager, then give the user the choice to View Employee by Manager
     if (userAction === "View Employee by Manager") {
       //prompt questions to user
       const viewEmployeeByManager = await db.query(employeeByManager);
       console.table(viewEmployeeByManager);
     }
 
-    // if ADD AN EMPLOYEE, then give the user the choice to add an employee
+    // if Delete Record, then give the user the choice to Delete Record
     if (userAction === "Delete Record") {
       const roles = await db.query("SELECT * FROM role");
       const employees = await db.query("SELECT * FROM  employee");
