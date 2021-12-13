@@ -142,14 +142,19 @@ const init = async () => {
         employeeManager = null,
       } = await inquirer.prompt(employeeInfo);
 
-      if (!employeeManager) {
-        await db.query(
-          `INSERT INTO employee(first_name, last_name, role_id) VALUE('${firstName}', '${lastName}', '${employeeRole}')`
-        );
-      } else {
-        await db.query(
-          `INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUE('${firstName}', '${lastName}', '${employeeRole}','${employeeManager}')`
-        );
+      try {
+        console.log(employeeManager);
+        if (!employeeManager) {
+          await db.query(
+            `INSERT INTO employee(first_name, last_name, role_id) VALUE('${firstName}', '${lastName}', '${employeeRole}')`
+          );
+        } else {
+          await db.query(
+            `INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUE('${firstName}', '${lastName}', '${employeeRole}', '${employeeManager}')`
+          );
+        }
+      } catch (error) {
+        console.log(error);
       }
 
       // template string query for department table
