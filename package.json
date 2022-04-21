@@ -1,0 +1,30 @@
+{
+  "name": "employee-management-system",
+  "version": "1.0.0",
+  "description": "A CLI application using node.js and sql to Create, Read, Update, and Delete Employees from a database using mySQL.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "seed": "node src/db/seed.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/conorjkelly96/employee-management-system.git"
+  },
+  "keywords": [],
+  "author": "Conor Kelly",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/conorjkelly96/employee-management-system/issues"
+  },
+  "homepage": "https://github.com/conorjkelly96/employee-management-system#readme",
+  "dependencies": {
+    "inquirer": "^8.2.0",
+    "mysql2": "^2.3.3",
+    "table": "^6.7.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
